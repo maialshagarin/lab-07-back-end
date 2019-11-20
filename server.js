@@ -76,6 +76,35 @@ function getWeather (query) {
           
           
         }
+       /* [
+            {
+              "link": "https://www.eventbrite.com/seattlejshackers/events/253823797/",
+              "name": "SeattleJS Hackers",
+              "event_date": "Wed Apr 23 2014",
+              "summary": "Come and meet other JS hackers at the Code Fellows campus!"
+            },
+            {
+              "link": "https://www.eventbrite.com/Angular-Seattle/events/253595182/",
+              "name": "Angular Seattle",
+              "event_date": "Tue May 09 2017",
+              "summary": "Want to better understand the hottest TypeScript framework?"
+            },
+            ...
+          ]*/
+          server.get('/event', eventHanddler);
+
+          function eventHanddler(req,res) {
+            getWeather(req.query.data)
+               .then (weatherData => res.status(200).json(weatherData) );
+           }
+
+          function Event (event){
+              this.link = event.link ;
+              this.name = event.name ;
+              this.event-date = event.event-date ;
+              this.summary = event.summary 
+
+          }
         server.use('*', (req,res) => {
             res.status(404).send('?????????');
           });
@@ -85,3 +114,4 @@ function getWeather (query) {
         });
        
         server.listen(PORT, () => console.log(`App listening on ${PORT}`));
+     
