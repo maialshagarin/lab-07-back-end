@@ -14,10 +14,6 @@ server.use(cors());
 
 
 
-
-
-
-
 server.get('/location',locationHandler)
 //  (request, response) => {
 //     const locationData = require('./data/geo.json');
@@ -25,7 +21,7 @@ server.get('/location',locationHandler)
 //     response.status(200).json(location);
 //   });
   function locationHandler(req,res){
-getlocation (city)(req.query.data)
+getlocation(req.query.data)
 .then(locationData => res.status(200).json(locationData));
   }
 
@@ -48,8 +44,8 @@ getlocation (city)(req.query.data)
 server.get('/weather', weatherHanddler);
 
 function weatherHanddler(req,res) {
-    let weatherData = getWeather(req.query.data);
-    res.status(200).json(weatherData);
+ getWeather(req.query.data)
+    .then (weatherData => res.status(200).json(weatherData) );
 }
 
 
