@@ -15,9 +15,6 @@ server.use(cors());
 
 
 
-
-
-
 server.get('/location',locationHandler)
 //  (request, response) => {
 //     const locationData = require('./data/geo.json');
@@ -25,7 +22,7 @@ server.get('/location',locationHandler)
 //     response.status(200).json(location);
 //   });
   function locationHandler(req,res){
-getlocation (city)(req.query.data)
+getlocation(req.query.data)
 .then(locationData => res.status(200).json(locationData));
   }
 
@@ -48,18 +45,24 @@ getlocation (city)(req.query.data)
 server.get('/weather', weatherHanddler);
 
 function weatherHanddler(req,res) {
-    let weatherData = getWeather(req.query.data);
-    res.status(200).json(weatherData);
+ getWeather(req.query.data)
+    .then (weatherData => res.status(200).json(weatherData) );
 }
 
 
-function getWeather (city) {
+function getWeather (query) {
+    const url = `https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${query.latitude},${query.longitude}`;
 
-    let data = require('./data/darksky.json');
-    
-    return data.daily.data.map( (day) => {
+    // let data = require('./data/darksky.json'); /// chanded with previous line ///
+    return superagent.get(url)
+    .then( data => {
+      let weather = data.body;
+      return weather.daily.data.map( (day) => {
         return new Weather(day);
-    })
+      });
+    });
+
+
 
  
   };
@@ -73,6 +76,9 @@ function getWeather (city) {
           
           
         }
+        server.use('*', (req,res) => {
+            res.status(404).send('?????????');
+          });
 
         server.get('*',(request,Response) =>{
             Response.status(500).send('Sorry, something went wrong');
