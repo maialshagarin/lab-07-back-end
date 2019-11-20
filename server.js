@@ -25,7 +25,7 @@ server.get('/location',locationHandler)
 //     response.status(200).json(location);
 //   });
   function locationHandler(req,res){
-getlocation (city)(req.quuery.data)
+getlocation (city)(req.query.data)
 .then(locationData => res.status(200).json(locationData));
   }
 
@@ -37,7 +37,6 @@ getlocation (city)(req.quuery.data)
           return new Location (city , data.body)
       })
   }
-//   console.log ("getlocation" , getlocation)
   
   function Location( city ,data ) {
       this.search_query = city;
@@ -55,7 +54,7 @@ function weatherHanddler(req,res) {
 
 
 function getWeather (city) {
-    // const url = ``
+
     let data = require('./data/darksky.json');
     
     return data.daily.data.map( (day) => {
