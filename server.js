@@ -14,6 +14,7 @@ server.use(cors());
 
 
 
+
 server.get('/location',locationHandler)
 //  (request, response) => {
 //     const locationData = require('./data/geo.json');
@@ -61,6 +62,9 @@ function getWeather (query) {
       });
     });
 
+
+
+ 
   };
   
   function Weather( day ) {
