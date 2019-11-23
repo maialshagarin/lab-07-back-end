@@ -17,7 +17,7 @@ server.use(cors());
 
 server.get('/location',locationHandler);
 server.get('/weather', weatherHanddler);
-server.get('/event', eventHanddler);
+server.get('/events', eventHanddler); ////// here i have a problem and gorob help me to solve it //////
 
 // /////// location handler //////
   function locationHandler(req,res){
@@ -58,8 +58,8 @@ getlocation(req.query.data)
     const url = `http://api.eventful.com/json/events/search?app_key=${process.env.EVENTBRITE_API_KEY}&location=${query.formatted_query}`;
     return superagent.get(url)
     .then( data => {
-      let event = JSON.parse(data.text);
-      return event.events.envet.map( (day) => {
+      let eventl = JSON.parse(data.text);
+      return eventl.events.event.map( (day) => {
         return new Event(day);
       });
     });
