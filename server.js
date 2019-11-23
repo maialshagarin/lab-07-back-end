@@ -13,47 +13,38 @@ const server = express();
 server.use(cors());
 
 
+// ////// call the handler function 
 
+server.get('/location',locationHandler);
+server.get('/weather', weatherHanddler);
+server.get('/event', eventHanddler);
 
-server.get('/location',locationHandler)
-//  (request, response) => {
-//     const locationData = require('./data/geo.json');
-//     const location = new Location(locationData);
-//     response.status(200).json(location);
-//   });
+// /////// location handler //////
   function locationHandler(req,res){
 getlocation(req.query.data)
 .then(locationData => res.status(200).json(locationData));
-  }
-
-
+  };
+// ///// weather handler ////////
+  function weatherHanddler(req,res) {
+    getWeather(req.query.data)
+       .then (weatherData => res.status(200).json(weatherData) );
+   };
+// ///// event handler /////////////// 
+   function eventHanddler(req,res) {
+    getEventINFO(req.query.data)
+       .then (eventData => res.status(200).json(eventData) );
+   };
+// ///// get the data from API for location /////
   function getlocation (city){
       const url =`https://maps.googleapis.com/maps/api/geocode/json?address=${city}&key=${process.env.GEOCODE_API_KEY}`
       return superagent.get(url)
       .then( data =>{
           return new Location (city , data.body)
       })
-  }
-  
-  function Location( city ,data ) {
-      this.search_query = city;
-      this.formatted_query = data.results[0].formatted_address;
-      this.latitude = data.results[0].geometry.location.lat;
-    this.longitude = data.results[0].geometry.location.lng;
-}
-
-server.get('/weather', weatherHanddler);
-
-function weatherHanddler(req,res) {
- getWeather(req.query.data)
-    .then (weatherData => res.status(200).json(weatherData) );
-}
-
-
-function getWeather (query) {
+  };
+  // /////  get the data from API for weather /////
+  function getWeather (query) {
     const url = `https://api.darksky.net/forecast/${process.env.DARKSKY_API_KEY}/${query.latitude},${query.longitude}`;
-
-    // let data = require('./data/darksky.json'); /// chanded with previous line ///
     return superagent.get(url)
     .then( data => {
       let weather = data.body;
@@ -61,50 +52,46 @@ function getWeather (query) {
         return new Weather(day);
       });
     });
-
-
-
- 
   };
+  // /////  get the data from API for weather /////
+  function getEventINFO (query) {
+    const url = `http://api.eventful.com/json/events/search?app_key=${process.env.EVENTBRITE_API_KEY}&location=${query.formatted_query}`;
+    return superagent.get(url)
+    .then( data => {
+      let event = JSON.parse(data.text);
+      return event.events.envet.map( (day) => {
+        return new Event(day);
+      });
+    });
+  };
+  
+  // ////// the constactour function of location to organize data ////////
+  function Location( city ,data ) {
+      this.search_query = city;
+      this.formatted_query = data.results[0].formatted_address;
+      this.latitude = data.results[0].geometry.location.lat;
+    this.longitude = data.results[0].geometry.location.lng;
+}
+
+  // ////// the constactour function of weather to organize data ////////
   
   function Weather( day ) {
 
       this.forecast = day.summary;
       this.time = new Date(day.time * 1000).toDateString();
-          // this.latitude = data.latitude
-          // this.longitude = data.longitude
-          
           
         }
-       /* [
-            {
-              "link": "https://www.eventbrite.com/seattlejshackers/events/253823797/",
-              "name": "SeattleJS Hackers",
-              "event_date": "Wed Apr 23 2014",
-              "summary": "Come and meet other JS hackers at the Code Fellows campus!"
-            },
-            {
-              "link": "https://www.eventbrite.com/Angular-Seattle/events/253595182/",
-              "name": "Angular Seattle",
-              "event_date": "Tue May 09 2017",
-              "summary": "Want to better understand the hottest TypeScript framework?"
-            },
-            ...
-          ]*/
-          server.get('/event', eventHanddler);
+          // ////// the constactour function of Event to organize data ////////
 
-          function eventHanddler(req,res) {
-            getWeather(req.query.data)
-               .then (weatherData => res.status(200).json(weatherData) );
-           }
-
-          function Event (event){
-              this.link = event.link ;
-              this.name = event.name ;
-              this.event-date = event.event-date ;
-              this.summary = event.summary 
+          function Event (day){
+              this.link = day.url ;
+              this.name = day.title ;
+              this.event_date = day.start_time ;
+              this.summary = day.description 
 
           }
+          // ////// error 
+         
         server.use('*', (req,res) => {
             res.status(404).send('?????????');
           });
@@ -112,6 +99,7 @@ function getWeather (query) {
         server.get('*',(request,Response) =>{
             Response.status(500).send('Sorry, something went wrong');
         });
+        // ///// listen to app 
        
         server.listen(PORT, () => console.log(`App listening on ${PORT}`));
      
